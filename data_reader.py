@@ -6,29 +6,29 @@ from selenium.webdriver.support.ui import Select
 import pandas as pd
 import time
 from datetime import datetime
-from cartera_methods import get_safs, get_fondos, get_cartera, click_buscar
+from cartera_methods import get_safs, get_fondos, get_cartera, click_buscar, id_cartera, get_cartera_text
 #import xlsxwriter
 
-def copy_table(driver):
-    table = driver.find_element_by_id("grdResumen01")
-    head = table.find_element_by_tag_name('th')
-    body = table.find_element_by_tag_name('tbody')
-    
-    file_data = []
-    file_header = []
-    head_line = head.find_element_by_tag_name("tr")
-    file_header = [header.text.encode("utf8") for header in head_line.find_elements_by_tag_name('th')]
-    file_data.append(",".join(file_header))
-    
-    body_rows = body.find_elements_by_tag_name('tr')
-    for row in body_rows:
-        data = row.find_elements_by_tag_name('td')
-        file_row = []
-        for datum in data:
-            datum_text = datum.text.encode('utf8')
-            file_row.append(datum_text)
-        file_data.append(",".join(file_row))
-    print(file_data)
+#def copy_table(driver):
+#    table = driver.find_element_by_id("grdResumen01")
+#    head = table.find_element_by_tag_name('th')
+#    body = table.find_element_by_tag_name('tbody')
+#    
+#    file_data = []
+#    file_header = []
+#    head_line = head.find_element_by_tag_name("tr")
+#    file_header = [header.text.encode("utf8") for header in head_line.find_elements_by_tag_name('th')]
+#    file_data.append(",".join(file_header))
+#    
+#    body_rows = body.find_elements_by_tag_name('tr')
+#    for row in body_rows:
+#        data = row.find_elements_by_tag_name('td')
+#        file_row = []
+#        for datum in data:
+#            datum_text = datum.text.encode('utf8')
+#            file_row.append(datum_text)
+#        file_data.append(",".join(file_row))
+#    print(file_data)
     
     
 chromedriver = 'C:/Users/P900017/Documents/Chromedriver/chromedriver.exe'
@@ -79,33 +79,65 @@ SAF_lista = get_safs(browser)
 
 SAF_search = browser.find_element_by_id("MainContent_TextBox1")
 
-SAF_search.send_keys(SAF_lista[1] + Keys.RETURN)
+SAF_search.send_keys(SAF_lista[8] + Keys.RETURN)
 time.sleep(2)
 fondos_lista = []
 Fondos = Select(browser.find_element_by_id("MainContent_cboFondo"))
 for fondo in Fondos.options:
     fondos_lista.append(fondo.text)
     
-Fondos.select_by_visible_text(fondos_lista[6])
-time.sleep(2)
-
 # Seleccionando año y mes
+#cartera_hist = []
+#for yr in ["2019"]:
+#    Year = Select(browser.find_element_by_id("MainContent_lisAnio"))
+#    Year.select_by_visible_text(yr)
+#    time.sleep(2)
+#    # get_months listo para iteración
+#    for mnth in [1]:
+#        Month = Select(browser.find_element_by_id("MainContent_lisMes"))
+#        Month.select_by_index(mnth)
+#        click_buscar(browser)
+#        # Falta implementar un loop para el botón de cada asset class!!! #######
+#        classes_num = len(browser.find_elements_by_class_name("item-grid"))
+#        for r in range(0, classes_num):
+#            boton_detalle = browser.find_element_by_id("MainContent_gdrResumenValorizacion_HyperLink1_" + str(r))
+#            # Obteniendo tabla de composición de cartera
+#            hold_df = get_cartera(browser, boton_detalle)
+#            cartera_hist.append(hold_df)
+#            hold_df.to_csv('cartera_test.csv') ### PRUEBA
+Fondos = Select(browser.find_element_by_id("MainContent_cboFondo"))
+time.sleep(2)
+Fondos.select_by_visible_text(fondos_lista[16])
+time.sleep(3)
 cartera_hist = []
 for yr in ["2019"]:
     Year = Select(browser.find_element_by_id("MainContent_lisAnio"))
-    Year.select_by_visible_text(yr)
-    time.sleep(2)
-    # get_months listo para iteración
-    for mnth in [1]:
-        Month = Select(browser.find_element_by_id("MainContent_lisMes"))
-        Month.select_by_index(mnth)
-        click_buscar(browser)
-        # Falta implementar un loop para el botón de cada asset class!!!
-        boton_detalle = browser.find_element_by_id("MainContent_gdrResumenValorizacion_HyperLink1_2")
-        # Obteniendo tabla de composición de cartera
-        hold_df = get_cartera(browser, boton_detalle)
-        cartera_hist.append(hold_df)
-        hold_df.to_csv('cartera_test.csv')
+    try:
+        Year.select_by_visible_text(yr)
+        time.sleep(3)
+        # get_months listo para iteración
+        for mon in [3]:
+            Month = Select(browser.find_element_by_id("MainContent_lisMes"))
+            try:
+                Month.select_by_index(mon)
+                click_buscar(browser)
+                # Falta implementar un loop para el botón de cada asset class!!! #######
+#                classes_num = len(browser.find_elements_by_class_name("item-grid"))
+#                for r in range(0, classes_num):
+#                    boton_detalle = browser.find_element_by_id("MainContent_gdrResumenValorizacion_HyperLink1_" + str(r))
+                boton_detalle = browser.find_element_by_id("MainContent_gdrResumenValorizacion_HyperLink1_0")
+                # Obteniendo tabla de composición de cartera
+                hold_df = get_cartera(browser, boton_detalle)
+                id_cartera(hold_df, 'SAF', yr, mon)
+                cartera_hist.append(hold_df)
+#                        hold_df.to_csv('cartera_test.csv') ### PRUEBA
+            except:
+                pass
+    except:
+        pass
+
+
+#NoSuchElementException:
 
 #########
 #for i in range(0,100):
