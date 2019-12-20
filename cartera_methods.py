@@ -58,15 +58,34 @@ def get_cartera(browser, boton_detalle):
     browser.switch_to.window(browser.window_handles[1])
     browser.get(cartera_url)            
     time.sleep(2)
-    #
-    # PULIR SELECCION DE ID de TABLA (cambia para cada asset class)
-    #
     holdings = browser.find_element_by_xpath("//table[@class='contenedor_centrado']/tbody/tr[3]")
     hold_df = pd.read_html(holdings.get_attribute('outerHTML'))[0]
     browser.close() #closes new tab
     time.sleep(1)
     browser.switch_to_window(WindowHandler)
     return hold_df
+
+def id_cartera(df, saf, yr, mon):
+    df['SAF'] = saf
+    df['Año'] = yr
+    df['Mes'] = mon
+
+def get_cartera_text(browser, boton_detalle, fondo, yr, mnth):
+    cartera_url = boton_detalle.get_attribute('href')
+    WindowHandler = browser.current_window_handle
+    browser.execute_script("window.open('');")
+    time.sleep(4)
+    browser.switch_to.window(browser.window_handles[1])
+    browser.get(cartera_url)            
+    time.sleep(2)
+    #
+    # PULIR SELECCION DE ID de TABLA (cambia para cada asset class)
+    #
+    if 'CENTENARIO' in browser.page_source:
+        print ('Centenario en ' + fondo + ' ' + yr + ' ' + mnth)
+    browser.close() #closes new tab
+    time.sleep(1)
+    browser.switch_to_window(WindowHandler)
 
 def get_months(i):
     mon_base = ['DICIEMBRE', 'NOVIEMBRE', 'OCTUBRE',
@@ -79,4 +98,9 @@ def get_months(i):
     else:
         return mon_base
 
+#def cod_saf(SAF_lista):
+#    for saf in 
+#    
+#    return SAF_cod
+     
     
