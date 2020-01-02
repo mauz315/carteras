@@ -60,15 +60,23 @@ def get_cartera(browser, boton_detalle):
     time.sleep(2)
     holdings = browser.find_element_by_xpath("//table[@class='contenedor_centrado']/tbody/tr[3]")
     hold_df = pd.read_html(holdings.get_attribute('outerHTML'))[0]
+    if 'Unnamed: 2' in list(hold_df.columns):
+        hold_df = hold_df.rename(columns=hold_df.iloc[0]).drop(hold_df.index[0])
+    hold_df.dropna(thresh=len(hold_df.columns)*2/3, inplace=True)
     browser.close() #closes new tab
     time.sleep(1)
     browser.switch_to_window(WindowHandler)
     return hold_df
 
-def id_cartera(df, saf, yr, mon):
+def id_cartera(df, saf, fondo, yr, mon):
     df['SAF'] = saf
     df['Año'] = yr
     df['Mes'] = mon
+    df['Fondo'] = fondo
+    cols = df.columns.tolist()
+    cols = cols[-4:] + cols[:-4]
+    df = df[cols]
+#    df['Asset_class'] = ac
 
 def get_cartera_text(browser, boton_detalle, fondo, yr, mnth):
     cartera_url = boton_detalle.get_attribute('href')
@@ -87,16 +95,24 @@ def get_cartera_text(browser, boton_detalle, fondo, yr, mnth):
     time.sleep(1)
     browser.switch_to_window(WindowHandler)
 
-def get_months(i):
-    mon_base = ['DICIEMBRE', 'NOVIEMBRE', 'OCTUBRE',
-                'SEPTIEMBRE', 'AGOSTO', 'JULIO', 'JUNIO',
-                'MAYO', 'ABRIL', 'MARZO', 'FEBRERO', 'ENERO']
-    mon_base.reverse()
-    if int(i) == datetime.now().year:
-        act_mon = datetime.now().month - 2 # delay de 3 meses + 1 de index
-        return mon_base[0:act_mon]
-    else:
-        return mon_base
+def get_months(m):
+    mnts = list(range(1,13))
+    mon_base = {}
+    for i in range(0,12):
+        mon_base[mnts[i]] = mnts[-i-1]
+    
+    return mon_base[m]
+
+def excel_sh_name(keys):
+    names = []
+    for key in keys:
+        k = key.replace('/', '-')
+        if len(key)> 30:
+            names.append(k[:30])
+        else:
+            names.append(k)
+    
+    return names
 
 #def cod_saf(SAF_lista):
 #    for saf in 
