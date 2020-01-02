@@ -78,13 +78,13 @@ for saf in target_safs[1:]:
         Fondos.select_by_visible_text(t_fondo)
         time.sleep(3)
         print('Exportando fondo: ' + t_fondo + '...')
-        for yr in ["2019"]:
+        for yr in ["2019","2018"]:
             Year = Select(browser.find_element_by_id("MainContent_lisAnio"))
             try:
                 Year.select_by_visible_text(yr)
                 time.sleep(3)
                 # get_months listo para iteración
-                for mon in [2]: ### range(1:13)
+                for mon in range(1,13): ### range(1:13)
                     Month = Select(browser.find_element_by_id("MainContent_lisMes"))
                     try:
                         Month.select_by_index(mon)
