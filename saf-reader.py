@@ -10,10 +10,12 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 import time
-from cartera_methods import get_safs, get_fondos, get_cartera, click_buscar, id_cartera, excel_sh_name
+from cartera_methods import get_safs, get_cartera, click_buscar, id_cartera, excel_sh_name
+import joblib
 
+# Archivo para cargar fondos, meses particulares
 
-# Testing methods
+cartera_cons = joblib.load('data/cartera_dict.sav')
 
 chromedriver = 'C:/Users/P900017/Documents/Chromedriver/chromedriver.exe'
 url = "https://www.smv.gob.pe/Frm_ResumenValorizacionCartera?data=59C6C53987D41333DC7375CD83EBB8CA01B1BF5776"
@@ -39,7 +41,7 @@ Fondos.select_by_visible_text(fondos_lista[24])
 # 16: SURA ACCIONES
 # 24: RENTA DÓLARES
 time.sleep(3)
-cartera_cons = {} # Cartera consolidada, cada key es un asset class
+# cartera_cons = {}
 
 for yr in ["2019","2018"]:
     Year = Select(browser.find_element_by_id("MainContent_lisAnio"))
