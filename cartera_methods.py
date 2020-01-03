@@ -5,13 +5,10 @@ Created on Thu Dec 12 15:12:36 2019
 @author: P900017
 """
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 import pandas as pd
 import time
-from datetime import datetime
 
 def get_safs(browser):
     
@@ -21,27 +18,15 @@ def get_safs(browser):
         SAF_lista.append(opt.text)
     return SAF_lista[1:]
 
-def get_fondos(browser, SAF_lista):
+def get_fondos(peer_group, saf):
     
-    SAF_search = browser.find_element_by_id("MainContent_TextBox1")
-    SAF_search.send_keys(SAF_lista[8])
-    SAF_search.send_keys(Keys.RETURN)
-    time.sleep(2)
-    fondos_lista = []
-    Fondos = Select(browser.find_element_by_id("MainContent_cboFondo"))
-    for fondo in Fondos.options:
-        fondos_lista.append(fondo.text)
-    return fondos_lista[1:]
-
-def get_date(browser, yr, mth):
-    
-    Year = Select(browser.find_element_by_id("MainContent_lisAnio"))
-    for i in [1,2,3]:
-        Year.select_by_index(i)
-        time.sleep(2)
-
-    Month = Select(browser.find_element_by_id("MainContent_lisMes"))
-    Month.select_by_index(mth)
+    fondos = peer_group['fondo_name'].loc[saf]
+    if isinstance(fondos, str):
+        target_fondos = []
+        target_fondos.append(fondos)
+        return target_fondos
+    else:
+        return list(fondos)
     
 def click_buscar(browser):
     
@@ -75,10 +60,10 @@ def id_cartera(df, saf, fondo, yr, mon):
     df['Fondo'] = fondo
     cols = df.columns.tolist()
     cols = cols[-4:] + cols[:-4]
-    df = df[cols]
+    return df[cols]
 #    df['Asset_class'] = ac
 
-def get_cartera_text(browser, boton_detalle, fondo, yr, mnth):
+def text_search(browser, boton_detalle, fondo, yr, mnth):
     cartera_url = boton_detalle.get_attribute('href')
     WindowHandler = browser.current_window_handle
     browser.execute_script("window.open('');")
