@@ -33,6 +33,13 @@ def click_buscar(browser):
     time.sleep(2)
     browser.find_element_by_id("MainContent_btnBuscar").click()
     time.sleep(2)    
+    
+def get_resumen(browser):
+
+    res = browser.find_element_by_id("MainContent_gdrResumenValorizacion")
+    resumen = pd.read_html(res.get_attribute('outerHTML'))[0]
+#    resumen = resumen.drop(labels='Unnamed: 6', axis=1)
+    return resumen    
 
 def get_cartera(browser, boton_detalle):
 
